@@ -5,6 +5,10 @@
  */
 package eulersolver;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,7 +33,78 @@ public class EulerSolver {
         //print(adjecentDigits(13)+"");
         //print(pythagorianTriplet(1000)+"");
         //print(sumPrimesUnder(2000000) + "");
-        print(productAdjecentNumers(4));
+        //print(productAdjecentNumers(4));
+        //print(highlyDivisibleTriangular(500) +"");
+        print(largeSum());
+    }
+    
+    private static String largeSum()
+    {
+        try{
+            File f = new File("src\\eulersolver\\largeSum.txt");
+            BufferedReader in = new BufferedReader(new FileReader(f));
+            String line = in.readLine();
+            List<BigInteger> b = new ArrayList<>();
+            while(line != null)
+            {
+                BigInteger big = new BigInteger(line);
+                b.add(big);
+                line = in.readLine();
+            }
+            while(b.size()>1)
+            {
+                List<BigInteger> helper = new ArrayList();
+                int size = b.size();
+                for(int i = 0; i < (int)(size+1)/2; i++)
+                {
+                    if(i == size-i-1)
+                        helper.add(b.get(i));
+                    else
+                        helper.add(b.get(i).add(b.get(size-i-1)));
+                }
+                print(helper.size());
+                b = helper;
+            }
+            BigInteger result = b.get(0);
+            return result.toString();
+            /*for(int i = 1; i < b.size();i++)
+            {
+                result = result.add(b.get(i));
+            }
+            return result.toString();*/
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+            return "Exception ";
+        }
+    }
+    
+    private static long highlyDivisibleTriangular(int n)
+    {
+        int counter = 1;
+        long sum = 0;
+        List divisors = new ArrayList();
+        for(int i = 0; i<n; i++)
+        {
+            sum+=counter++;
+        }
+        while(divisors.size()<n)
+        {
+            sum+=counter++;
+            divisors = new ArrayList();
+            int x = 1;
+            while(!divisors.contains(x) && x<Math.sqrt(sum))
+            {
+                if(sum%x==0){
+                    divisors.add(x);
+                    divisors.add(sum/x);
+                }
+                x++;
+            }
+            print(divisors.size()+"");
+        }
+        return sum;
     }
     
     private static int productAdjecentNumers(int n)
