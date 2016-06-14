@@ -35,7 +35,26 @@ public class EulerSolver {
         //print(sumPrimesUnder(2000000) + "");
         //print(productAdjecentNumers(4));
         //print(highlyDivisibleTriangular(500) +"");
-        print(largeSum());
+        //print(largeSum());
+        print(gridMovement(20)+"");
+    }
+    
+    public static long gridMovement(int n)
+    { 
+        long sum = 2;
+
+        for(int i = 1; i<n; i++)
+        {
+            long product = 1L;
+            long divider = 1L;
+            for(int j=1;j<=i;j++)
+            {
+                product *= n-j+1;
+                divider *= j;
+            }
+            sum += (product/divider)*(product/divider);
+        }
+        return sum;
     }
     
     private static String largeSum()
