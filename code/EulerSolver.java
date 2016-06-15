@@ -36,10 +36,72 @@ public class EulerSolver {
         //print(productAdjecentNumers(4));
         //print(highlyDivisibleTriangular(500) +"");
         //print(largeSum());
-        print(gridMovement(20)+"");
+        //print(gridMovement(20)+"");
+        //print(collatzSequence(1000000));
+        print(NumberLetterCounts());
     }
     
-    public static long gridMovement(int n)
+    private static int NumberLetterCounts()
+    {
+        String[] upToTwenty = {"","one","two","three","four","five","six","seven","eight","nine","ten","eleven","twelve","thirteen","fourteen","fifteen","sixteen","seventeen","eighteen","nineteen"};
+        String[] upToHundred = {"twenty","thirty","forty","fifty","sixty","seventy","eighty","ninety"};
+        String hunder = "hundred";
+        String and = "and";
+        String thousand = "thousand";
+        int sum = 0;
+        for(int i = 1; i <=1000;i++)
+        {
+            String s = "";
+            if(i<20)
+            {
+                s += upToTwenty[i];
+                //sum += upToTwenty[i].toCharArray().length;
+            }
+            else if(i<100)
+            {
+                s+= upToHundred[(i/10)-2];
+                //sum += upToHundred[(i/10)-2].toCharArray().length;
+                s+=upToTwenty[i%10];
+                //sum += upToTwenty[i%10].toCharArray().length;
+            }
+            else if(i<1000)
+            {
+                s+= upToTwenty[i/100];
+                //sum+= upToTwenty[i/100].toCharArray().length;
+                s+= hunder;
+                //sum+= hunder.toCharArray().length;
+                int n = i%100;
+                if(n==0){
+                    print(i + " " + s + ": length= " + s.toCharArray().length);
+                    sum += s.length();
+                    continue;
+                }
+                s+= and;
+                //sum+= and.toCharArray().length;
+                if(n<20)
+                {
+                    s+= upToTwenty[n];
+                  //  sum += upToTwenty[n].toCharArray().length;
+                }
+                else if(n<100)
+                {
+                    s+=upToHundred[(n/10)-2];
+                    //sum += upToHundred[(n/10)-2].toCharArray().length;
+                    s+= upToTwenty[n%10];
+                    //sum += upToTwenty[n%10].toCharArray().length;
+                }
+
+            }
+            sum+=s.length();
+            print(i + " " + s + ": length= " + s.toCharArray().length);
+            print(sum);
+
+        }
+        sum+=11;
+        return sum;
+    }
+    
+    private static long gridMovement(int n)
     { 
         long sum = 2;
 
@@ -55,6 +117,36 @@ public class EulerSolver {
             sum += (product/divider)*(product/divider);
         }
         return sum;
+    }
+    
+    private static int collatzSequence(int start)
+    {
+        int size = 0;
+        int maxNum = 0;
+        for(int i=2; i<start;i++)
+        {
+            int counter = collatz((long)i);
+            if(counter > size)
+            {
+                size = counter;
+                maxNum = i;
+            }
+        }
+        return maxNum;
+    }
+    
+    private static int collatz(long num)
+    {
+        int counter=1;
+        while(num>1)
+        {
+            counter+=1;
+            if(num%2 == 0)
+                num = num/2;
+            else
+                num = num*3 + 1;
+        }
+        return counter;
     }
     
     private static String largeSum()
@@ -380,6 +472,14 @@ public class EulerSolver {
     
     private static void print(int i){
         print(i+"");
+    }
+    
+    private static void print(List n)
+    {
+        for(int i = 0; i <n.size(); i++)
+        {
+            print(n.get(i) + "");
+        }
     }
     
     private static void print(String s)
