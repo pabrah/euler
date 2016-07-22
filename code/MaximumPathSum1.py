@@ -115,12 +115,35 @@ def DigitFiboNumber(n=1000):
 		index += 1
 	print(index)
 
-def ReciprocalCycles(d=1000):
-	for x in range(7, d, 2):
-		if x%3==0 or x%5==0:
-			continue
-		r = str(1/x).replace("0.","")
-		print(r)
+def ReciprocalCycles():
+	seq = 0
+	li = []
+	for i in range(2, 1000):
+		remain = []
+		r = 1%i
+		r = 10*r
+		remain.append(r)
+		counter = 0
+		bol = True
+		while r%i != 0:
+			r = (r%i)
+			while r < i:
+				r = r*10
+			if r in remain:
+				x = len(remain)-remain.index(r)
+				li.append((i, x))
+				break
+			remain.append(r)
+			if len(remain) >= i:
+				break
+	seq = 0
+	m = 0
+	for i in li:
+		(x, y) = i
+		if y > seq:
+			seq = y
+			m = x
+	print((m, seq))
 
 def QuadraticPrimes(ne=1000):
 	nn = ne*-1 + 1
@@ -219,9 +242,6 @@ def DigitFifthPowers(n=5):
 		if x == i:
 			pows.append(i)
 	print(sum(pows))
-
-def CoinSum(n=200):
-	print("Not done")
 
 def PandigitalProducts():
 	product = 0
@@ -431,5 +451,273 @@ def SubStringDivisibility():
 			total += int(''.join(x))
 	print(total)
 
+def PantogenNumbers():
+	l = [int(x*(x*3-1)/2) for x in range(1,3000)]
+	o = [] 
+	cont = [None] * (l[-1]+1)
+	for a in l:
+		cont[a] = 1
+	for a in l:
+		holder = 0
+		for b in l:
+			if b - holder > a:
+				break
+			holder = b
+			c = a+b
+			d = b-a
+			if d < 0:
+				d = d*-1
+			if cont[d] == 1 and c < len(cont) and cont[c] == 1:
+				o.append((d, c))
+				print(d, c)
+
+	print(o)
+
+def TriangPentaHexa():
+	hexa = [int(x*(x*2-1)) for x in range(144, 40000)]
+	l = set(hexa)
+	exists = []
+	del hexa
+	penta = [int(x*(x*3-1)/2) for x in range(285, 40000)]
+	for x in penta:
+		a = len(l)
+		l.add(x)
+		if a == len(l):
+			print(x)
+			exists.append(x)
+	del penta
+	del l
+	triang = [int(x*(x+1)/2) for x in range(100000)]
+	for x in range(len(triang)):
+		for y in exists:
+			if(triang[x] == y):
+				print(triang[x])
+				del triang
+				del exists
+				print("done")
+				return
+	del triang
+	del exists
+	print("done")
+
+def GoldbachConjecture():
+	primes = []
+	oddComp = []
+	for x in range(2,10000000):
+		if is_prime(x) :
+			primes.append(x)
+		elif x % 2 == 1:
+			oddComp.append(x)
+	for x in oddComp:
+		goldbach = False
+		for prime in primes:
+			if prime > x-2:
+				break
+			for i in range(1, int((x-prime)/2 +2)):
+				if x == prime + 2 * i * i :
+					goldbach = True
+		if not goldbach :
+			print(x)
+			break
+
+
+def getPrimesUnder(n):
+	primes = []
+	for x in range(2, n):
+		if is_prime(x):
+			primes.append(x)
+	return primes
+
+def getDistinctPrimeFactors(n):
+	l = set()
+	if n % 2 == 0 :
+		l.add(2)
+		while n % 2 == 0:
+			n = n / 2
+	if n % 3 == 0:
+		l.add(3)
+		while n % 3 == 0:
+			n = n/3
+	
+	f = 5
+	while f <= n:
+		if n%f == 0: 
+			n = n / f
+			l.add(f)
+			continue
+		if n%(f+2) == 0:
+			n = n / (f+2)
+			l.add(f+2)
+			continue
+		f +=6
+	return l
+
+def DistinctPrimeFactors(n=4):
+	for x in range(400, 1000000, n):
+		if len(getDistinctPrimeFactors(x)) == n:
+			consecutive = 0
+			first = 0
+			for i in range(x-n, x+n,1):
+				if len(getDistinctPrimeFactors(i)) == n:
+					consecutive += 1
+					if first == 0:
+						first = i
+					if consecutive == n:
+						print(first)
+						return
+				else:
+					consecutive = 0
+					first = 0
+
+def SelfPowers():
+	print(str(sum([x**x for x in range(1,1000)]))[-10:])
+
+def PrimePermutations():
+	for x in range(1488,10000):
+		perms = list(itertools.permutations(list(str(x))))
+		a = x+3330
+		b = x+3330*2
+		if not is_prime(x) or not is_prime(a) or not is_prime(b):
+			continue
+		abool = False
+		bbool = False
+		for p in perms:
+			if a == int(''.join(list(p))):
+				abool = True
+			if b == int(''.join(list(p))):
+				bbool = True
+
+		if abool and bbool:
+			print(str(x) + str(a) + str(b))
+			return
+
+def ConsecutivePrimeSum():
+	primes = getPrimesUnder(1000000)
+	m = 0
+	c = 0
+	for x in primes:
+		n = 0
+		consecutive = []
+		s = sum(consecutive)
+		while s < x:
+			consecutive.append(primes[n])
+			s = sum(consecutive)
+			br = False
+			if s == x:
+				if len(consecutive) > m:
+					m = len(consecutive)
+					c = x
+					break
+			while s > x:
+				consecutive = consecutive[1:]
+				s = sum(consecutive)
+				if len(consecutive) < m-2:
+					br = True
+			if br :
+				break
+			if s == x:
+				if len(consecutive) > m:
+					m = len(consecutive)
+					c = x
+					break
+
+			n+=1
+			s = sum(consecutive)
+	print((c, m))
+
+def CoinSums():
+	coins = [1, 2, 5, 10, 20, 50, 100, 200]
+	m = [0 for x in range(201)]
+	m[0] = 1
+	for coin in coins:
+		for x in range(coin, 201):
+			m[x] += m[x-coin]
+	
+	print(m[200])
+
+def CoinPartition():
+	p = []
+	p.append(1)
+	n = 1
+	while True:
+		i = 0
+		penta = 1
+		p.append(0)
+		sign = [1, 1,-1,-1]
+		while penta <= n:
+			p[n] += sign[i%4] * p[n-penta]
+			p[n] = p[n] % 10**6
+			i+=1
+			j = int(i/2 + 1)
+			j = j if i % 2 == 0 else -1*j
+			penta = int(j*(j*3-1)/2)
+		if p[n] == 0:
+			print(n)
+			break
+		n+=1
+
+def DigitCancellingFractions():
+	l = 1
+	k = 1
+	for i in range(10,100):
+		if i%10==0 or i%11==0:
+			continue
+		for y in range(i+1,100):
+			if y%10==0 or y%11==0:
+				continue
+			li = removeDigit(i, y)
+			if len(li) == 0:
+				continue
+			a = int(li[0])
+			b = int(li[1])
+			if a/b == i/y:
+				l = l*a
+				k = k*b
+	if k%l==0:
+		print(k/l)
+
+def removeDigit(n, m):
+	l = []
+	s = list(str(n))
+	t = list(str(m))
+	if s[0] in t:
+		l.append(s[1])
+		t.remove(s[0])
+		l.append(t[0])
+	elif s[1] in t:
+		l.append(s[0])
+		t.remove(s[1])
+		l.append(t[0])
+	return l
+
+def PermutedMultiples():
+	i = 1
+	tens = 1
+	while True:
+		bol = True
+		s = list(str(i))
+		if int(i/tens) > 1:
+			tens=tens*10
+			i = tens
+			continue
+		for a in range(2,7):
+			t = list(str(i*a))
+			if sorted(s) != sorted(t):
+				bol=False
+				break
+		if bol:
+			break
+		i+=1
+	print(i)
+
+def CombinatoricSelections():
+	m = 0
+	s = 1
+	for i in range(20,101):
+		for j in range(1, i):
+			if math.factorial(i)/(math.factorial(j)*math.factorial(i-j)) > 10**6:
+				m+=1
+	print(m)
+
 if __name__ == "__main__":
-	SubStringDivisibility()
+	CombinatoricSelections()
