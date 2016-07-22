@@ -1,6 +1,7 @@
 import math 
 import bisect
 import itertools
+from collections import Counter
 def MaximumPathSum1(numRows):
 	f=open('p067_triangle.txt')
 	lines=f.readlines()
@@ -719,5 +720,62 @@ def CombinatoricSelections():
 				m+=1
 	print(m)
 
+def PokerHands():
+	f=open('p054_poker.txt')
+	lines = f.readlines()
+	f.close()
+	hands = (line.split() for line in lines)
+	values = {r:i for i,r in enumerate('23456789TJQKA', start=2)}
+	print( "Project Euler 54 Solution =", sum(hand_rank(hand[:5]) > hand_rank(hand[5:]) for hand in hands))
+
+	
+def hand_rank(hand):
+	values = {r:i for i,r in enumerate('23456789TJQKA',start=2)}
+	straights = [(v, v-1, v-2, v-3, v-4) for v in range(14,5,-1)] + [(14,5,4,3,2)]
+	ranks = [(1,1,1,1,1),(2,1,1,1),(2,2,1),(3,1,1),(),(),(3,2),(4,1)]
+	score = list(zip(*sorted(((v, values[k]) for
+		k,v in Counter(x[0] for x in hand).items()), reverse=True)))
+	score[0] = ranks.index(score[0])
+	if len(set(card[1] for card in hand)) == 1: score[0] = 5  # flush
+	if score[1] in straights: 
+		score[0] = 8 if score[0] == 5 else 4  # str./str. flush
+		if score[1] == (14,5,4,3,2): 
+			score[1] = (5,4,3,2,1)
+	return score
+
+def PrimeDigitReplacement():
+	primes = rwh_primes1(10**7)
+	print("Starting")
+	counter = 1
+	for i in primes: 
+		for j in range(0,2):
+			s = str(i)
+			if s[0] == str(j):
+				continue
+			n = s.count(str(j))
+			if n <= 1:
+				continue
+			count = 0
+			for x in range(0,10):
+				s = str(i)
+				s = s.replace(str(j),str(x))
+				if int(s) in primes:
+					count+=1
+				if 10-x+count < 7:
+					break
+			if count >= 8:
+				print(i)
+				return
+		if counter % 10*3 == 0:
+			print(i)
+		counter+=1
+		
+def rwh_primes1(n):
+    sieve = [True] * int(n/2)
+    for i in range(3,int(n**0.5)+1,2):
+        if sieve[int(i/2)]:
+            sieve[int(i*i/2)::i] = [False] * int((n-i*i-1)/(2*i)+1)
+    return [2] + [2*i+1 for i in range(1,int(n/2)) if sieve[i]]
+
 if __name__ == "__main__":
-	CombinatoricSelections()
+	PrimeDigitReplacement()
