@@ -333,18 +333,7 @@ def DoubleBasePalindromes(n=585):
 	print(sum(pals))
 
 def isPalindrome(n):
-	l = list(str(n))
-	x = len(l)-1
-	if(l[0]=="0" or l[x]=="0"):
-		return False
-	b = True
-	for a in range(x+1):
-		if l[a] != l[x-a]:
-			b = False
-			break
-	if not b:
-		return False
-	return True
+	return str(n) == str(n)[::-1]
 
 def baseN(num,b,numerals="0123456789abcdefghijklmnopqrstuvwxyz"):
 	return ((num == 0) and numerals[0]) or (baseN(num // b, b, numerals).lstrip(numerals[0]) + numerals[num % b])
@@ -771,11 +760,284 @@ def PrimeDigitReplacement():
 		counter+=1
 		
 def rwh_primes1(n):
-    sieve = [True] * int(n/2)
-    for i in range(3,int(n**0.5)+1,2):
-        if sieve[int(i/2)]:
-            sieve[int(i*i/2)::i] = [False] * int((n-i*i-1)/(2*i)+1)
-    return [2] + [2*i+1 for i in range(1,int(n/2)) if sieve[i]]
+	sieve = [True] * int(n/2)
+	for i in range(3,int(n**0.5)+1,2):
+		if sieve[int(i/2)]:
+			sieve[int(i*i/2)::i] = [False] * int((n-i*i-1)/(2*i)+1)
+	return [2] + [2*i+1 for i in range(1,int(n/2)) if sieve[i]]
+
+def LychrelNumbers():
+	lych = 0
+	for i in range(1, 10000):
+		n = i
+		x = False 
+		counter = 0
+		while not x:
+			n = n + reverseAdd(n)
+			x = isPalindrome(n)
+			counter+=1
+			if counter >= 50:
+				break
+		if not x:
+			lych+=1
+	print(lych)
+
+def reverseAdd(n):
+	return int(str(n)[::-1])
+	
+def PowerfulDigitSum():
+	m = 0
+	for i in range(1,100):
+		for j in range(1,100):
+			powerSum = sum_digits(i ** j)
+			if powerSum > m:
+				m = powerSum
+	print(m)
+			
+def sum_digits(n):
+	s = 0
+	while n:
+		s += n % 10
+		n //= 10
+	return s
+
+def SquareRootConvergents():
+	numerator = 7
+	denominator = 5
+	count = 0
+	for i in range(2,1000):
+		numerator, denominator = numerator + 2*denominator, numerator+denominator
+		if len(str(numerator)) > len(str(denominator)):
+			count+=1
+	print(count)
+
+def SpiralPrimes():
+	primes = 0
+	counter = 1
+	length = 0
+	for i in range(2,100000,2):
+		length = i+1
+		for y in range(4):
+			counter+=i
+			if is_prime(counter):
+				primes+=1
+		if primes*100 / (length*2-1) < 10:
+			break
+	print(length)
+
+def XorDecryption():
+	f = open("p059_cipher.txt")
+	lines = f.readlines()
+	f.close()
+	numbers = [(int(y) for y in x.split(",")) for x in lines]
+	numbers = list(numbers[0])
+	words = ["the","be","is", "a", "though"]
+	text = ""
+	for a in range(97,123):
+		for b in range(97,123):
+			for c in range(97,123):
+				text = ""
+				for i in range(0, len(numbers)):
+					if i % 3 == 0:
+						text+= chr(numbers[i]^a)
+					elif i%3==1:
+						text+= chr(numbers[i]^b)
+					elif i%3==2:
+						text+= chr(numbers[i]^c)
+				if all(x in text for x in words):
+					print(text)
+					print(sum([ord(x) for x in list(text)]))
+					print((a,b,c))
+					return
+def CyclicalFigurateNumbers():
+	func = [lambda x:x*x , lambda x:x*(3*x-1)/2 , lambda x:x*(2*x-1) , lambda x:x*(5*x-3)/2 , lambda x:x*(3*x-2)]
+	perms = list(itertools.permutations(range(5)))
+	for p in perms:
+		l = []
+		for t in range(43,200):
+			triang = int(t*(t+1)/2)
+			if triang % 100 < 10 or triang < 1000:
+				continue
+			if triang > 10000:
+				break
+			l.append([triang])
+		counter = 1
+		for x in list(p):
+			for i in range(1,200):
+				s = int(func[x](i))
+				if s < 1000 or s >= 10000 or s%100 < 10:
+					continue
+				add_number(l, s, counter)
+			counter+=1
+			l = remove_short_lists(l, counter)
+		if len(l) >= 1:
+			for x in range(len(l)):
+				if l[x][-1]%100==int(l[x][0]/100):
+					print(sum(l[x]))
+
+def remove_short_lists(l, n):
+	li = []
+	for x in l:
+		if len(x) >= n:
+			li.append(x)
+	return li
+
+
+def add_number(l, n, m):
+	for x in range(len(l)):
+		if len(l[x])>m:
+			continue
+		if n%100==int(l[x][0]/100):
+			l.append([n] + l[x])
+		if l[x][-1]%100==int(n/100):
+			l.append([x]+[n])
+	return l
+
+def is_cube(n):
+	return int(round(n**(1/3))) ** 3 == n
+
+def CubicPermutations():
+	counter=14
+	d = {} 
+	s = ""
+	l = ['0']*15
+	while True:
+		counter+=1
+		cube = counter ** 3
+		s = ''.join(sorted(str(cube),reverse=True)) 
+		l.append(s)
+		if s in d:
+			d[s] += 1
+		else:
+			d[s] = 1
+		if d[s] == 5:
+			print(s)
+			break
+	i = l.index(s)
+	print(i**3)
+
+def PowerfulDigitCounts():
+	power = 1
+	s = 0
+	while True:
+		counter = 1
+		length = len(str(counter**power))
+		while length <= power:
+			if length == power:
+				s+=1
+			counter+=1
+			length = len(str(counter**power))
+		power+=1
+		print(s)
+		if s >= 49:
+			break
+			
+
+def OddPeriodSquareRoots():
+	odds = 0
+	for s in range(1,10001):
+		m = 0
+		d = 1
+		a = int(s**0.5)
+		an = a
+		l = []
+		counter = 0
+		while True:
+			m = int(d*an-m)
+			d = int((s-m**2)/d)
+			if d == 0:
+				break
+			an = int((a+m)/d)
+			if (an,m,d) in l:
+				break
+			l.append((an,m,d))
+		if len(l)%2==1:
+			odds+=1
+	print(odds)
+
+def ConvergentsOfE():
+	a,b = 2,3
+	n = 2
+	for i in range(2,100):
+		if i%3==2:
+			x = n*b+a
+			a = b
+			b = x
+			n+=2
+		else:
+			b = b+a
+			a = b-a
+	print(sum([int(i) for i in list(str(b))]))
+
+def continued_fraction(s):
+	m = 0
+	d = 1
+	a = int(s**0.5)
+	an = a
+	l = []
+	l.append((an,m,d))
+	li = [an]
+	while True:
+		m = int(d*an-m)
+		d = int((s-m**2)/d)
+		if d == 0:
+			break
+		an = int((a+m)/d)
+		if (an,m,d) in l:
+			break
+		l.append((an,m,d))
+		li.append(an)
+	return li
+
+def DiophantineEquation():
+	cubes = []
+	biggest = []
+	d = 0
+	for i in range(2,1001):
+		if i**2 < 1001:
+			cubes.append(i**2)
+		if i in cubes:
+			continue
+		m,d,a = 0,1,int(math.sqrt(i))
+		num1, num = 1, a
+		den1, den = 0,1
+
+		while num**2-i*den**2 != 1:
+			m = int(d*a-m)
+			d = int((i-m**2)/d)
+			a = int(((math.sqrt(i))+m)/d)
+			num2 = num1
+			num1 = num
+			den2 = den1
+			den1 = den
+			num = a*num1 + num2
+			den = a*den1 + den2
+		if num>d:
+			biggest.append((num,i))
+			d=num
+		print(i)
+
+	print(sorted(biggest, reverse=True)[0])
+
+def chakravala(N):
+	m = m0 = int(round(N**0.5))
+	a, b, k = m, 1, m*m - N
+	if k == 0:
+		return (0,0)
+	
+	while k != 1:
+		if k == -1 or abs(k) == 2 or (abs(k) == 4 and not (a&1 and b&1)):
+			return ((a*a + N*b*b)//abs(k), 2*a*b//abs(k))
+		diff = (m + m0) % abs(k)
+		m_lo = m0 - diff
+		m_hi = m_lo + abs(k)
+		m = m_hi if abs(m_hi*m_hi - N) < abs(m_lo*m_lo - N) else m_lo
+			  
+		a, b, k = (m*a + N*b)//abs(k), (a + b*m)//abs(k), (m*m - N)//k
+	return (a, b)
+		      
+def solve(limit=1000):
+	return max(range(2, limit+1), key=lambda D: chakravala(D)[0])
 
 if __name__ == "__main__":
-	PrimeDigitReplacement()
+	DiophantineEquation()
