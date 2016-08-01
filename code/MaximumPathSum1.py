@@ -2,6 +2,8 @@ import math
 import bisect
 import itertools
 from collections import Counter
+from fractions import gcd
+import timeit
 def MaximumPathSum1(numRows):
 	f=open('p067_triangle.txt')
 	lines=f.readlines()
@@ -1015,29 +1017,368 @@ def DiophantineEquation():
 		if num>d:
 			biggest.append((num,i))
 			d=num
-		print(i)
 
 	print(sorted(biggest, reverse=True)[0])
 
-def chakravala(N):
-	m = m0 = int(round(N**0.5))
-	a, b, k = m, 1, m*m - N
-	if k == 0:
-		return (0,0)
+def Magic5GonRing():
+	l_low = list(itertools.permutations(range(1,6)))
+	l_hi = list(itertools.permutations(range(6,11)))
+	sol = []
+	for l in l_low:
+		for p in l_hi:
+			v=l[-1]+l[0]+p[-1]
+			bol = True
+			for x in range(4):
+				if l[x]+l[x+1]+p[x] != v:
+					bol=False
+			if bol:
+				sol.append((p,l))
+	m = []
+	for a,b in sol:
+		x, y = list(a),list(b)
+		val = 11
+		i = -1
+		for v in range(5):
+			if x[v] < val:
+				val = x[v]
+				i = v
+		s = ""
+		for index in range(i,i-5,-1):
+			if index != 4:
+				s+=str(x[index]) + str(y[index+1]) + str(y[index])
+			else:
+				s+=str(x[index]) + str(y[0]) + str(y[index])
+		if len(s) == 16:
+			m.append(int(s))
+	print(sorted(m, reverse=True))
+
 	
-	while k != 1:
-		if k == -1 or abs(k) == 2 or (abs(k) == 4 and not (a&1 and b&1)):
-			return ((a*a + N*b*b)//abs(k), 2*a*b//abs(k))
-		diff = (m + m0) % abs(k)
-		m_lo = m0 - diff
-		m_hi = m_lo + abs(k)
-		m = m_hi if abs(m_hi*m_hi - N) < abs(m_lo*m_lo - N) else m_lo
-			  
-		a, b, k = (m*a + N*b)//abs(k), (a + b*m)//abs(k), (m*m - N)//k
-	return (a, b)
-		      
-def solve(limit=1000):
-	return max(range(2, limit+1), key=lambda D: chakravala(D)[0])
+def TotientMaximum():
+	i = 1
+	p = 1
+	s = 2
+	m,v=0,0
+	primes = [1] + rwh_primes1(10**3)
+	for x in range(2, len(primes)):
+		s=s*primes[x]
+		if s > 10**6:
+			break
+		p+=1
+		i = bisect.bisect_left(primes, s)
+		q = s//int(i-p)
+		if q>m:
+			m=q
+			v=s
+	print(v,m)
+
+def totient(n):
+	if is_prime(n):
+		return n-1
+	primes = rwh_primes1(int(n/2)+1)
+	s = set()
+	for q in primes:
+		if n%q==0:
+			s.add(q)
+	for q in s:
+		n = n*(1-(1/q))
+	return int(n)
+
+def TotientPermutation():
+	least = []
+	primes = rwh_primes1(int(10**3.5)*2)
+	i = bisect.bisect_left(primes, int(10**3.5))-1
+	q = i-1
+	while i < len(primes):
+		s = i
+		x = primes[i]*primes[s]
+		while primes[s]*x > 10**7:
+			if x > 10**7:
+				s-=1
+				x=primes[i]*primes[s]
+				continue
+			y = (primes[i]-1)*(primes[s]-1)
+			if sorted(list(str(x))) == sorted(list(str(y))):
+				least.append((x/y,x))
+			s-=1
+			x=primes[i]*primes[s]
+		i+=1
+	while primes[q]**3 > 10**7:
+		s = q
+		x = primes[q]*primes[s]
+		while primes[s]*x > 10**7:
+			if x > 10**7:
+				s-=1
+				x=primes[i]*primes[s]
+				continue
+			y=(primes[q]-1)*(primes[s]-1)
+			if sorted(list(str(x))) == sorted(list(str(y))):
+				least.append((x/y, x))
+			s-=1
+			x=primes[q]*primes[s]
+		q-=1
+	print(sorted(least)[0])
+
+def OrderedFractions():
+	fracts = []
+	u,v = 3,7
+	i = 1
+	while i*v < 10**6:
+		i+=1
+	i-=1
+	u = u*i - 1 
+	print(u)
+
+def relative_primes(n):
+	if is_prime(n):
+		return []
+	primes = rwh_primes1(int(n/2)+1)
+	s = set()
+	for q in primes:
+		if n%q==0:
+			s.add(q)
+	return s
+
+def CountingFractions():
+	l = [0]*(10**6+1)
+	s = 0
+	for i in range(2,10**6+1):
+		x = l[i]
+		if x > 0:
+			s+=x
+			print(i)
+			continue
+		t = relative_primes(i)
+		v = i
+		for u in t:
+			v = int(v*(u-1)/u)
+		for u in t:
+			y = i*u
+			while y < 10**6:
+				l[y]=v*int(y/i)
+				y = y*u
+		if not t:
+			s+=i-1
+		else:
+			s += v
+	print(s)
+
+def CountingFractions2():
+	N = 10**6+1
+
+	a = list(range(N))
+	b = [0]*N
+
+	for p in range(2,N):
+		if b[p]:
+			continue
+		a[p] -= 1
+		for j in range(p+p,N,p):
+			b[j] = 1
+			a[j] -= a[j]//p
+	print(sum(a)-1)
+
+def CountingFractionsInRange():
+	n1, d1, n2, d2 = 1, 3, 1, 2
+	n = [0] * 12001
+	for d in range(1, 12001):
+		n[d] += -1*((-n2*d)//d2) + ((-n1*d)//d1) -1
+		n[2*d::d] = [k-n[d] for k in n[2*d::d]]
+	print(sum(n))
+
+def factorial_sum(n):
+	l = [int(i) for i in str(n)]
+	fact = [1]
+	for i in range(1,10):
+		fact.append(i *fact[-1])
+	return sum([fact[x] for x in l])
+
+def DigitFactorialChains():
+	s = 0
+	for i in range(10**3,10**6):
+		f = factorial_sum(i)
+		l = [i]
+		while f not in l:
+			l.append(f)
+			f = factorial_sum(f)
+		if len(l)==60:
+			s+=1
+	print(s)
+
+def SingularIntegerRightTriangles():
+	num = 1500001
+	li = [0]*num
+	score = 0
+	for m in range(2,int((num/2)**0.5)):
+		for n in range(1,m):
+			if ((n+m)%2)==1 and gcd(n,m)==1:
+				a = m*m + n*n
+				b = m*m - n*n
+				c = 2 * m * n
+				p = a+b+c
+				while p < num:
+					li[p]+=1
+					if li[p] == 1: score+=1
+					if li[p] == 2: score-=1
+					p+=a+b+c
+	print(score)
+
+def CountingSummations():
+	p = []
+	p.append(1)
+	n = 1
+	while n<=100:
+		i = 0
+		penta = 1
+		p.append(0)
+		sign = [1, 1,-1,-1]
+		while penta <= n:
+			p[n] += sign[i%4] * p[n-penta]
+			i+=1
+			j = int(i/2 + 1)
+			j = j if i % 2 == 0 else -1*j
+			penta = int(j*(j*3-1)/2)
+		n+=1
+	print(p[100]-1)
+	return p
+
+def CountingPrimes():
+	print("Not done")
+	primes = rwh_primes(100000)
+
+def PathSumTwoWays():
+	f = open("p081_matrix.txt")
+	lines = f.readlines()
+	f.close()
+	l = []
+	c = 0
+	for line in lines:
+		l.append([])
+		for x in line.split(","):
+			l[c].append((int(x), 0))
+		c+=1
+	(a, b) = l[79][79]
+	l[79][79] = (a, a)
+	for x in range(79,-1,-1):
+		for y in range(79,0,-1):
+			(a,b) = l[x][y]
+			(n,m) = l[x][y-1]
+			(j,k) = l[x-1][y] if x>0 else (99999,1)
+			if m == 0 or b+n<m:
+				l[x][y-1] = (n, b+n)
+			if k == 0 or b+j<k:
+				l[x-1][y] = (j, b+j)
+	print(l[0][0])
+
+class node:
+	def __init__(self, i, j, value, goal, prev=0):
+		self.i = i
+		self.j = j
+		self.goal = goal
+		self.value = value
+		self.prev = prev
+	def __eq__(self, other):
+		if type(other) is node:
+			return self.i == other.i and self.j == other.j
+		return False
+	def __lt__(self, other):
+		return self.fx() < other.fx()
+	def fx(self):
+		return self.gx() + self.hx()
+	def gx(self):
+		if self.prev==0:
+			return self.value
+		return self.prev.gx() + self.value
+	def hx(self):
+		return 0
+	def update(self, other):
+		self.prev = other.prev
+
+def AStar(matrix, start, goal):
+	closed = []
+	openSet = []
+	(i, j) = start
+	n = node(i, j, matrix[i][j], goal)
+	openSet.append(n)
+	(g1, g2) = goal
+	while openSet:
+		current = openSet.pop(0)
+		if current.i==g1 and current.j==g2:
+			return current
+		closed.append(current)
+		i, j = current.i, current.j
+		neighbors = []
+		a, b = i-1, i+1
+		c, d = j-1, j+1
+		if a>=0:
+			neighbors.append(node(a,j,matrix[a][j],goal,current))
+		if b<len(matrix):
+			neighbors.append(node(b,j,matrix[b][j],goal,current))
+		if c>=0:
+			neighbors.append(node(i,c,matrix[i][c],goal,current))
+		if d<len(matrix[0]):
+			neighbors.append(node(i,d,matrix[i][d],goal,current))
+		for neighbor in neighbors:
+			if neighbor in closed:
+				continue
+			if neighbor not in openSet:
+				openSet.append(neighbor)
+			else:
+				n = openSet.index(neighbor)
+				if openSet[n].gx() > neighbor.gx():
+					openSet[n].update(neighbor)
+
+		openSet = sorted(openSet)
+	print("failed")
+
+def ShortestPath():
+	f = open("p083_matrix.txt")
+	lines = f.readlines()
+	f.close()
+	matrix = []
+	c = 0
+	for line in lines:
+		matrix.append([])
+		for x in line.split(","):
+			matrix[c].append(int(x))
+		c+=1
+	
+	n = AStar(matrix,(0,0),(79,79))
+	print(n.fx())
+
+def PathSumThreeWays():
+	matrix = [ [0] + [int(y) for y in x.strip().split(",")] + [0] for x in open("p082_matrix.txt").readlines()] 
+	print(AStar(matrix,(0,0),(79,81)).fx())
+
+def SquareRootDigitalExpansion():
+	x = 0
+	for i in range(2,100):
+		b = 5
+		a = 5*i
+		q = int(i**0.5)
+		if q*q==i:
+			continue
+		while len(str(b))<108:
+			if a>=b: a, b = a-b, b+10
+			elif a<b: a, b = a*100, b*10-45
+		l = list(str(b))
+		for v in range(0,100):
+			x+=int(l[v])
+	print(x)
+
+def CountingRectangles():
+	limit = 2 * 10**6
+	n = 2
+	while n*(n+1)/2*3<limit:
+		n+=1
+	n-=1
+	print(n)
+	diff = limit - n*(n+1)/2*3
+	n+=1
+	print(n)
+	if n*(n+1)/2*3 - limit < diff:
+		print(n*2)
+	else:
+		print((n-1)*2)
 
 if __name__ == "__main__":
-	DiophantineEquation()
+	CountingRectangles()
