@@ -1366,19 +1366,19 @@ def SquareRootDigitalExpansion():
 	print(x)
 
 def CountingRectangles():
-	limit = 2 * 10**6
-	n = 2
-	while n*(n+1)/2*3<limit:
-		n+=1
-	n-=1
-	print(n)
-	diff = limit - n*(n+1)/2*3
-	n+=1
-	print(n)
-	if n*(n+1)/2*3 - limit < diff:
-		print(n*2)
-	else:
-		print((n-1)*2)
+	j = 2
+	x,y,z = 0,0,2*10**6
+	for i in range(2,500):
+		for j in range(i,1000):
+			s = int(((i+1)*i/2)*((j+1)*j/2))
+			diff = 2*10**6 - s
+			if diff < 0 and diff*-1 > z:
+				break
+			diff = diff if diff > 0 else diff*-1
+			if diff < z:
+				x,y,z=i,j,diff
+	print(x*y)
+	print(z)
 
 if __name__ == "__main__":
 	CountingRectangles()
